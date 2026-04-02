@@ -1,13 +1,12 @@
 <!DOCTYPE html>
-<html lang="ko" data-theme="dark">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>오늘 저녁 뭐 먹지?</title>
+  <title>What's for Dinner Tonight?</title>
   <style>
     * { box-sizing: border-box; transition: background 0.3s, color 0.3s, border-color 0.3s; }
 
-    /* ── 다크 모드 (기본) ── */
     [data-theme="dark"] {
       --bg: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
       --container-bg: rgba(255,255,255,0.07);
@@ -43,7 +42,6 @@
       --divider: rgba(255,255,255,0.1);
     }
 
-    /* ── 라이트 모드 ── */
     [data-theme="light"] {
       --bg: linear-gradient(135deg, #f5f0e8, #fde9c9, #ffd580);
       --container-bg: rgba(255,255,255,0.75);
@@ -101,7 +99,7 @@
       position: relative;
     }
 
-    /* ── 상단 우측 버튼 그룹 ── */
+    /* Top-right controls */
     .top-controls {
       position: absolute;
       top: 16px;
@@ -124,16 +122,9 @@
     }
     .top-btn:hover { opacity: 0.75; }
 
-    h1 {
-      color: var(--title-color);
-      font-size: 2rem;
-      margin-bottom: 6px;
-    }
-    p.sub {
-      color: var(--sub-color);
-      margin-bottom: 32px;
-      font-size: 0.92rem;
-    }
+    h1 { color: var(--title-color); font-size: 2rem; margin-bottom: 6px; }
+    p.sub { color: var(--sub-color); margin-bottom: 32px; font-size: 0.92rem; }
+
     .category-filter {
       display: flex;
       gap: 8px;
@@ -223,7 +214,7 @@
     button#pickBtn:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(240,165,0,0.6); }
     button#pickBtn:active { transform: scale(0.97); }
 
-    /* ── 제휴 문의 폼 ── */
+    /* Partnership form */
     .form-section {
       margin-top: 40px;
       padding-top: 32px;
@@ -248,10 +239,7 @@
       gap: 4px;
       margin-bottom: 14px;
     }
-    .form-group label {
-      color: var(--form-label);
-      font-size: 0.82rem;
-    }
+    .form-group label { color: var(--form-label); font-size: 0.82rem; }
     .form-group input,
     .form-group textarea,
     .form-group select.form-select {
@@ -303,100 +291,101 @@
 </head>
 <body>
   <div class="container">
+
     <div class="top-controls">
-      <a href="en.html" class="top-btn">🇺🇸 EN</a>
-      <button class="top-btn" onclick="toggleTheme()" id="themeBtn">☀️ 라이트</button>
+      <a href="index.html" class="top-btn">🇰🇷 KO</a>
+      <button class="top-btn" onclick="toggleTheme()" id="themeBtn">☀️ Light</button>
     </div>
 
-    <h1>🍽️ 오늘 저녁 뭐 먹지?</h1>
-    <p class="sub">카테고리를 고르고 랜덤 메뉴 추천을 받아보세요</p>
+    <h1>🍽️ What's for Dinner?</h1>
+    <p class="sub">Pick a category and get a random dinner recommendation</p>
 
     <div class="category-filter">
-      <button class="cat-btn active" onclick="setCategory(this,'all')">전체</button>
-      <button class="cat-btn" onclick="setCategory(this,'korean')">🇰🇷 한식</button>
-      <button class="cat-btn" onclick="setCategory(this,'chinese')">🥡 중식</button>
-      <button class="cat-btn" onclick="setCategory(this,'japanese')">🍱 일식</button>
-      <button class="cat-btn" onclick="setCategory(this,'western')">🍝 양식</button>
-      <button class="cat-btn" onclick="setCategory(this,'snack')">🍜 분식</button>
+      <button class="cat-btn active" onclick="setCategory(this,'all')">All</button>
+      <button class="cat-btn" onclick="setCategory(this,'korean')">🇰🇷 Korean</button>
+      <button class="cat-btn" onclick="setCategory(this,'chinese')">🥡 Chinese</button>
+      <button class="cat-btn" onclick="setCategory(this,'japanese')">🍱 Japanese</button>
+      <button class="cat-btn" onclick="setCategory(this,'western')">🍝 Western</button>
+      <button class="cat-btn" onclick="setCategory(this,'snack')">🍜 Street Food</button>
     </div>
 
     <div style="margin-bottom:6px;">
-      <label id="countLabel" style="font-size:0.85rem;color:var(--label-color);">추천 개수 &nbsp;</label>
+      <label style="font-size:0.85rem;color:var(--label-color);">Suggestions &nbsp;</label>
       <select id="countSel">
-        <option value="1">1개</option>
-        <option value="2">2개</option>
-        <option value="3" selected>3개</option>
-        <option value="5">5개</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3" selected>3</option>
+        <option value="5">5</option>
       </select>
     </div>
 
     <div id="result-area"></div>
-    <button id="pickBtn" onclick="pick()">🎲 메뉴 추천받기</button>
+    <button id="pickBtn" onclick="pick()">🎲 Recommend a Dish</button>
 
-    <!-- 제휴 문의 폼 -->
+    <!-- Partnership inquiry form -->
     <div class="form-section">
-      <h2>🤝 제휴 문의</h2>
-      <p class="form-sub">식당, 브랜드, 광고 제휴 문의를 남겨주세요</p>
+      <h2>🤝 Partnership Inquiry</h2>
+      <p class="form-sub">Reach out for restaurant, brand, or advertising partnerships</p>
 
       <form id="contactForm" action="https://formspree.io/f/maqldnjl" method="POST">
         <div class="form-group">
-          <label for="fname">이름 / 회사명</label>
-          <input type="text" id="fname" name="name" placeholder="홍길동 / (주)맛있는식당" required>
+          <label for="fname">Name / Company</label>
+          <input type="text" id="fname" name="name" placeholder="John Doe / Tasty Restaurant Inc." required>
         </div>
         <div class="form-group">
-          <label for="femail">이메일</label>
+          <label for="femail">Email</label>
           <input type="email" id="femail" name="email" placeholder="example@email.com" required>
         </div>
         <div class="form-group">
-          <label for="ftype">문의 유형</label>
+          <label for="ftype">Inquiry Type</label>
           <select id="ftype" name="type" class="form-select">
-            <option value="식당 제휴">식당 제휴</option>
-            <option value="브랜드 제휴">브랜드 제휴</option>
-            <option value="광고 문의">광고 문의</option>
-            <option value="기타">기타</option>
+            <option value="Restaurant Partnership">Restaurant Partnership</option>
+            <option value="Brand Partnership">Brand Partnership</option>
+            <option value="Advertising">Advertising</option>
+            <option value="Other">Other</option>
           </select>
         </div>
         <div class="form-group">
-          <label for="fmsg">문의 내용</label>
-          <textarea id="fmsg" name="message" rows="4" placeholder="문의하실 내용을 자유롭게 작성해 주세요." required></textarea>
+          <label for="fmsg">Message</label>
+          <textarea id="fmsg" name="message" rows="4" placeholder="Tell us about your inquiry..." required></textarea>
         </div>
-        <button type="submit" id="submitBtn">✉️ 문의 보내기</button>
+        <button type="submit" id="submitBtn">✉️ Send Inquiry</button>
       </form>
-      <div class="form-success" id="formSuccess">✅ 문의가 성공적으로 전송되었습니다. 빠르게 연락드리겠습니다!</div>
+      <div class="form-success" id="formSuccess">✅ Your message has been sent! We'll get back to you shortly.</div>
     </div>
   </div>
 
   <script>
     const MENUS = [
-      { name:'삼겹살',   cat:'korean',   emoji:'🥩', desc:'두툼한 삼겹살에 쌈 채소와 된장찌개',        tag:'인기' },
-      { name:'김치찌개', cat:'korean',   emoji:'🍲', desc:'칼칼하고 깊은 맛의 돼지 김치찌개',          tag:'집밥' },
-      { name:'된장찌개', cat:'korean',   emoji:'🥣', desc:'구수한 된장에 두부와 호박',                  tag:'집밥' },
-      { name:'불고기',   cat:'korean',   emoji:'🍖', desc:'달콤한 양념 소불고기 덮밥',                  tag:'한식' },
-      { name:'비빔밥',   cat:'korean',   emoji:'🥗', desc:'형형색색 나물과 고추장 비빔밥',              tag:'건강식' },
-      { name:'순두부찌개',cat:'korean',  emoji:'🍳', desc:'보들보들 순두부에 해물 또는 돼지고기',       tag:'집밥' },
-      { name:'갈비탕',   cat:'korean',   emoji:'🍜', desc:'진하게 우린 소갈비탕',                      tag:'보양식' },
-      { name:'제육볶음', cat:'korean',   emoji:'🥘', desc:'매콤달콤 돼지고기 제육볶음 + 공기밥',        tag:'집밥' },
-      { name:'닭볶음탕', cat:'korean',   emoji:'🍗', desc:'칼칼한 양념의 닭볶음탕',                    tag:'한식' },
-      { name:'짜장면',   cat:'chinese',  emoji:'🍝', desc:'고소한 춘장 짜장에 달걀 후라이',             tag:'중식' },
-      { name:'짬뽕',     cat:'chinese',  emoji:'🦐', desc:'해물이 가득한 칼칼한 짬뽕',                 tag:'중식' },
-      { name:'탕수육',   cat:'chinese',  emoji:'🍖', desc:'바삭한 탕수육 (부먹 or 찍먹 선택)',          tag:'중식' },
-      { name:'마파두부', cat:'chinese',  emoji:'🌶️', desc:'매콤한 사천식 마파두부 덮밥',               tag:'중식' },
-      { name:'볶음밥',   cat:'chinese',  emoji:'🍚', desc:'파, 달걀, 새우가 들어간 중국식 볶음밥',      tag:'간단' },
-      { name:'초밥',     cat:'japanese', emoji:'🍣', desc:'신선한 생선을 얹은 쥐어짠 초밥 세트',        tag:'일식' },
-      { name:'라멘',     cat:'japanese', emoji:'🍜', desc:'진한 돈코츠 or 쇼유 라멘',                  tag:'일식' },
-      { name:'돈가스',   cat:'japanese', emoji:'🍱', desc:'바삭한 돈가스 + 카레 or 소스',               tag:'일식' },
-      { name:'우동',     cat:'japanese', emoji:'🍜', desc:'쫄깃한 면발의 따뜻한 우동',                 tag:'일식' },
-      { name:'규동',     cat:'japanese', emoji:'🥩', desc:'달콤한 소고기 양파 규동 덮밥',               tag:'일식' },
-      { name:'파스타',   cat:'western',  emoji:'🍝', desc:'알리오올리오 or 크림 페투치네',              tag:'양식' },
-      { name:'피자',     cat:'western',  emoji:'🍕', desc:'화덕 or 도우 피자 한 판',                   tag:'양식' },
-      { name:'스테이크', cat:'western',  emoji:'🥩', desc:'미디엄 레어 채끝 스테이크',                 tag:'특식' },
-      { name:'햄버거',   cat:'western',  emoji:'🍔', desc:'수제 패티 버거 + 감자튀김',                 tag:'양식' },
-      { name:'리조또',   cat:'western',  emoji:'🍚', desc:'버섯 크림 리조또',                          tag:'양식' },
-      { name:'떡볶이',   cat:'snack',    emoji:'🌶️', desc:'쫀득한 떡볶이 + 튀김 + 순대',              tag:'분식' },
-      { name:'라볶이',   cat:'snack',    emoji:'🍜', desc:'라면과 떡볶이의 황금 조합',                 tag:'분식' },
-      { name:'김밥',     cat:'snack',    emoji:'🍙', desc:'참치 or 치즈 김밥 + 어묵국',                tag:'분식' },
-      { name:'쫄면',     cat:'snack',    emoji:'🥗', desc:'새콤달콤 쫄면 + 반숙 달걀',                 tag:'분식' },
-      { name:'순대국밥', cat:'snack',    emoji:'🍲', desc:'구수한 순대국밥에 소면 추가',               tag:'분식' },
+      { name:'Samgyeopsal',    cat:'korean',   emoji:'🥩', desc:'Grilled pork belly with lettuce wraps & doenjang stew',  tag:'Popular' },
+      { name:'Kimchi Jjigae',  cat:'korean',   emoji:'🍲', desc:'Spicy kimchi stew with pork and tofu',                   tag:'Home Meal' },
+      { name:'Doenjang Jjigae',cat:'korean',   emoji:'🥣', desc:'Savory fermented soybean paste stew with zucchini',      tag:'Home Meal' },
+      { name:'Bulgogi',        cat:'korean',   emoji:'🍖', desc:'Sweet marinated beef over steamed rice',                  tag:'Korean' },
+      { name:'Bibimbap',       cat:'korean',   emoji:'🥗', desc:'Colorful veggie rice bowl with gochujang sauce',          tag:'Healthy' },
+      { name:'Sundubu Jjigae', cat:'korean',   emoji:'🍳', desc:'Silken tofu stew with seafood or pork',                  tag:'Home Meal' },
+      { name:'Galbi-tang',     cat:'korean',   emoji:'🍜', desc:'Rich short rib bone broth soup',                         tag:'Nourishing' },
+      { name:'Jeyuk Bokkeum',  cat:'korean',   emoji:'🥘', desc:'Spicy stir-fried pork with rice',                        tag:'Home Meal' },
+      { name:'Dak Bokkeum-tang',cat:'korean',  emoji:'🍗', desc:'Braised spicy chicken with vegetables',                  tag:'Korean' },
+      { name:'Jajangmyeon',    cat:'chinese',  emoji:'🍝', desc:'Noodles in savory black bean sauce with egg',             tag:'Chinese' },
+      { name:'Jjamppong',      cat:'chinese',  emoji:'🦐', desc:'Spicy seafood noodle soup',                              tag:'Chinese' },
+      { name:'Tangsuyuk',      cat:'chinese',  emoji:'🍖', desc:'Crispy sweet & sour pork (dip or pour — your call)',      tag:'Chinese' },
+      { name:'Mapo Tofu',      cat:'chinese',  emoji:'🌶️', desc:'Spicy Sichuan-style tofu over rice',                    tag:'Chinese' },
+      { name:'Fried Rice',     cat:'chinese',  emoji:'🍚', desc:'Chinese-style fried rice with egg, scallion & shrimp',   tag:'Quick' },
+      { name:'Sushi',          cat:'japanese', emoji:'🍣', desc:'Fresh nigiri sushi set',                                  tag:'Japanese' },
+      { name:'Ramen',          cat:'japanese', emoji:'🍜', desc:'Rich tonkotsu or shoyu ramen',                           tag:'Japanese' },
+      { name:'Tonkatsu',       cat:'japanese', emoji:'🍱', desc:'Crispy pork cutlet with curry or sauce',                  tag:'Japanese' },
+      { name:'Udon',           cat:'japanese', emoji:'🍜', desc:'Chewy thick noodles in warm dashi broth',                tag:'Japanese' },
+      { name:'Gyudon',         cat:'japanese', emoji:'🥩', desc:'Tender beef & onion rice bowl',                          tag:'Japanese' },
+      { name:'Pasta',          cat:'western',  emoji:'🍝', desc:'Aglio e olio or creamy fettuccine',                      tag:'Western' },
+      { name:'Pizza',          cat:'western',  emoji:'🍕', desc:'Wood-fired or pan pizza, your choice',                   tag:'Western' },
+      { name:'Steak',          cat:'western',  emoji:'🥩', desc:'Medium-rare sirloin steak',                              tag:'Special' },
+      { name:'Burger',         cat:'western',  emoji:'🍔', desc:'Smash-patty burger with fries',                          tag:'Western' },
+      { name:'Risotto',        cat:'western',  emoji:'🍚', desc:'Creamy mushroom risotto',                                tag:'Western' },
+      { name:'Tteokbokki',     cat:'snack',    emoji:'🌶️', desc:'Spicy rice cakes with fish cake & fried snacks',        tag:'Street Food' },
+      { name:'Rabokki',        cat:'snack',    emoji:'🍜', desc:'Ramen noodles in spicy tteokbokki sauce',                tag:'Street Food' },
+      { name:'Gimbap',         cat:'snack',    emoji:'🍙', desc:'Korean rice rolls (tuna or cheese) + fish cake soup',    tag:'Street Food' },
+      { name:'Jjolmyeon',      cat:'snack',    emoji:'🥗', desc:'Chewy noodles in sweet & spicy sauce with soft egg',     tag:'Street Food' },
+      { name:'Sundae Gukbap',  cat:'snack',    emoji:'🍲', desc:'Blood sausage rice soup with thin noodles',              tag:'Street Food' },
     ];
 
     let currentCat = 'all';
@@ -405,7 +394,7 @@
       const html = document.documentElement;
       const isDark = html.getAttribute('data-theme') === 'dark';
       html.setAttribute('data-theme', isDark ? 'light' : 'dark');
-      document.getElementById('themeBtn').textContent = isDark ? '🌙 다크' : '☀️ 라이트';
+      document.getElementById('themeBtn').textContent = isDark ? '🌙 Dark' : '☀️ Light';
     }
 
     function setCategory(el, cat) {
@@ -437,11 +426,10 @@
 
     pick();
 
-    // 제휴 문의 폼 AJAX 전송
     document.getElementById('contactForm').addEventListener('submit', async function(e) {
       e.preventDefault();
       const btn = document.getElementById('submitBtn');
-      btn.textContent = '전송 중...';
+      btn.textContent = 'Sending...';
       btn.disabled = true;
       try {
         const res = await fetch(this.action, {
@@ -453,14 +441,14 @@
           this.style.display = 'none';
           document.getElementById('formSuccess').style.display = 'block';
         } else {
-          btn.textContent = '✉️ 문의 보내기';
+          btn.textContent = '✉️ Send Inquiry';
           btn.disabled = false;
-          alert('전송에 실패했습니다. 다시 시도해 주세요.');
+          alert('Failed to send. Please try again.');
         }
       } catch {
-        btn.textContent = '✉️ 문의 보내기';
+        btn.textContent = '✉️ Send Inquiry';
         btn.disabled = false;
-        alert('네트워크 오류가 발생했습니다.');
+        alert('Network error. Please check your connection.');
       }
     });
   </script>

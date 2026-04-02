@@ -27,3 +27,14 @@ function generateAndDisplayNumbers() {
 generateBtn.addEventListener('click', generateAndDisplayNumbers);
 
 generateAndDisplayNumbers();
+
+const themeToggle = document.getElementById('theme-toggle');
+
+themeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('dark');
+    if (document.body.classList.contains('dark')) {
+        themeToggle.textContent = '☀️ 화이트모드';
+    } else {
+        themeToggle.textContent = '🌙 다크모드';
+    }
+});

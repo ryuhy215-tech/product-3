@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>로또 추천번호 생성기</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+    }
+    .container {
+      background: rgba(255,255,255,0.05);
+      border-radius: 20px;
+      padding: 40px;
+      text-align: center;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.1);
+      width: 420px;
+    }
+    h1 {
+      color: #f0e68c;
+      font-size: 1.8rem;
+      margin-bottom: 10px;
+    }
+    p.sub {
+      color: #aaa;
+      margin-bottom: 30px;
+      font-size: 0.9rem;
+    }
+    .game {
+      display: flex;
+      align-items: center;
+      margin-bottom: 14px;
+      gap: 10px;
+    }
+    .game-label {
+      color: #aaa;
+      font-size: 0.85rem;
+      width: 50px;
+      text-align: right;
+    }
+    .balls {
+      display: flex;
+      gap: 8px;
+    }
+    .ball {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 0.95rem;
+      color: white;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    .b1  { background: radial-gradient(circle at 35% 35%, #ffdd57, #f0a500); color: #333; }
+    .b2  { background: radial-gradient(circle at 35% 35%, #48c774, #257942); }
+    .b3  { background: radial-gradient(circle at 35% 35%, #3273dc, #1a56b0); }
+    .b4  { background: radial-gradient(circle at 35% 35%, #ff3860, #b5003a); }
+    .b5  { background: radial-gradient(circle at 35% 35%, #888, #444); }
+    button {
+      margin-top: 24px;
+      padding: 14px 40px;
+      background: linear-gradient(135deg, #f0a500, #ffdd57);
+      color: #333;
+      border: none;
+      border-radius: 50px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.2s;
+      box-shadow: 0 4px 15px rgba(240,165,0,0.4);
+    }
+    button:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(240,165,0,0.6); }
+    button:active { transform: scale(0.97); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎱 로또 번호 생성기</h1>
+    <p class="sub">1~45 중 랜덤 6개 번호 추천</p>
+    <div id="results"></div>
+    <button onclick="generate()">번호 생성하기</button>
+  </div>
+
+  <script>
+    const colorClass = n =>
+      n <= 10 ? 'b1' : n <= 20 ? 'b2' : n <= 30 ? 'b3' : n <= 40 ? 'b4' : 'b5';
+
+    function generate() {
+      const container = document.getElementById('results');
+      container.innerHTML = '';
+      for (let g = 1; g <= 5; g++) {
+        const nums = [...Array(45).keys()].map(i => i+1)
+          .sort(() => Math.random() - 0.5).slice(0, 6).sort((a,b) => a-b);
+        const balls = nums.map(n =>
+          `<div class="ball ${colorClass(n)}">${n}</div>`).join('');
+        container.innerHTML +=
+          `<div class="game">
+            <span class="game-label">${g}게임</span>
+            <div class="balls">${balls}</div>
+          </div>`;
+      }
+    }
+
+    generate();
+  </script>
+</body>
+</html>

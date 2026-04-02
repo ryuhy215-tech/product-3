@@ -34,6 +34,13 @@
       --toggle-bg: rgba(255,255,255,0.1);
       --toggle-color: #ccc;
       --toggle-border: rgba(255,255,255,0.2);
+      --input-bg: rgba(255,255,255,0.06);
+      --input-border: rgba(255,255,255,0.15);
+      --input-color: #eee;
+      --input-placeholder: #777;
+      --form-title: #ffdd57;
+      --form-label: #bbb;
+      --divider: rgba(255,255,255,0.1);
     }
 
     /* ── 라이트 모드 ── */
@@ -63,6 +70,13 @@
       --toggle-bg: rgba(0,0,0,0.06);
       --toggle-color: #555;
       --toggle-border: rgba(0,0,0,0.15);
+      --input-bg: rgba(255,255,255,0.85);
+      --input-border: rgba(0,0,0,0.15);
+      --input-color: #222;
+      --input-placeholder: #aaa;
+      --form-title: #c47d00;
+      --form-label: #555;
+      --divider: rgba(0,0,0,0.1);
     }
 
     body {
@@ -203,6 +217,83 @@
     }
     button#pickBtn:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(240,165,0,0.6); }
     button#pickBtn:active { transform: scale(0.97); }
+
+    /* ── 제휴 문의 폼 ── */
+    .form-section {
+      margin-top: 40px;
+      padding-top: 32px;
+      border-top: 1px solid var(--divider);
+      text-align: left;
+    }
+    .form-section h2 {
+      color: var(--form-title);
+      font-size: 1.1rem;
+      margin-bottom: 6px;
+      text-align: center;
+    }
+    .form-section p.form-sub {
+      color: var(--sub-color);
+      font-size: 0.82rem;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 14px;
+    }
+    .form-group label {
+      color: var(--form-label);
+      font-size: 0.82rem;
+    }
+    .form-group input,
+    .form-group textarea,
+    .form-group select.form-select {
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      color: var(--input-color);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 0.88rem;
+      outline: none;
+      width: 100%;
+      font-family: inherit;
+      resize: vertical;
+    }
+    .form-group input::placeholder,
+    .form-group textarea::placeholder { color: var(--input-placeholder); }
+    .form-group input:focus,
+    .form-group textarea:focus { border-color: var(--cat-active-border); }
+    .form-group select.form-select { cursor: pointer; margin-bottom: 0; }
+    .form-group select.form-select option { background: var(--select-opt-bg); }
+    button#submitBtn {
+      width: 100%;
+      margin-top: 6px;
+      padding: 12px;
+      background: linear-gradient(135deg, #f0a500, #ffdd57);
+      color: #333;
+      border: none;
+      border-radius: 50px;
+      font-size: 0.95rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.2s;
+      box-shadow: 0 4px 15px rgba(240,165,0,0.4);
+    }
+    button#submitBtn:hover { transform: scale(1.02); box-shadow: 0 6px 20px rgba(240,165,0,0.6); }
+    button#submitBtn:active { transform: scale(0.98); }
+    .form-success {
+      display: none;
+      text-align: center;
+      color: #4caf7d;
+      font-size: 0.95rem;
+      padding: 14px;
+      border-radius: 10px;
+      background: rgba(76,175,80,0.1);
+      border: 1px solid rgba(76,175,80,0.25);
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
@@ -233,6 +324,38 @@
 
     <div id="result-area"></div>
     <button id="pickBtn" onclick="pick()">🎲 메뉴 추천받기</button>
+
+    <!-- 제휴 문의 폼 -->
+    <div class="form-section">
+      <h2>🤝 제휴 문의</h2>
+      <p class="form-sub">식당, 브랜드, 광고 제휴 문의를 남겨주세요</p>
+
+      <form id="contactForm" action="https://formspree.io/f/maqldnjl" method="POST">
+        <div class="form-group">
+          <label for="fname">이름 / 회사명</label>
+          <input type="text" id="fname" name="name" placeholder="홍길동 / (주)맛있는식당" required>
+        </div>
+        <div class="form-group">
+          <label for="femail">이메일</label>
+          <input type="email" id="femail" name="email" placeholder="example@email.com" required>
+        </div>
+        <div class="form-group">
+          <label for="ftype">문의 유형</label>
+          <select id="ftype" name="type" class="form-select">
+            <option value="식당 제휴">식당 제휴</option>
+            <option value="브랜드 제휴">브랜드 제휴</option>
+            <option value="광고 문의">광고 문의</option>
+            <option value="기타">기타</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="fmsg">문의 내용</label>
+          <textarea id="fmsg" name="message" rows="4" placeholder="문의하실 내용을 자유롭게 작성해 주세요." required></textarea>
+        </div>
+        <button type="submit" id="submitBtn">✉️ 문의 보내기</button>
+      </form>
+      <div class="form-success" id="formSuccess">✅ 문의가 성공적으로 전송되었습니다. 빠르게 연락드리겠습니다!</div>
+    </div>
   </div>
 
   <script>
@@ -305,6 +428,33 @@
     }
 
     pick();
+
+    // 제휴 문의 폼 AJAX 전송
+    document.getElementById('contactForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      btn.textContent = '전송 중...';
+      btn.disabled = true;
+      try {
+        const res = await fetch(this.action, {
+          method: 'POST',
+          body: new FormData(this),
+          headers: { 'Accept': 'application/json' }
+        });
+        if (res.ok) {
+          this.style.display = 'none';
+          document.getElementById('formSuccess').style.display = 'block';
+        } else {
+          btn.textContent = '✉️ 문의 보내기';
+          btn.disabled = false;
+          alert('전송에 실패했습니다. 다시 시도해 주세요.');
+        }
+      } catch {
+        btn.textContent = '✉️ 문의 보내기';
+        btn.disabled = false;
+        alert('네트워크 오류가 발생했습니다.');
+      }
+    });
   </script>
 </body>
 </html>

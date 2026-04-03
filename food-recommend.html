@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>오늘 저녁 뭐 먹지?</title>
+  <style>
+    * { box-sizing: border-box; transition: background 0.3s, color 0.3s, border-color 0.3s; }
+
+    /* ── 다크 모드 (기본) ── */
+    [data-theme="dark"] {
+      --bg: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+      --container-bg: rgba(255,255,255,0.07);
+      --container-border: rgba(255,255,255,0.12);
+      --title-color: #ffdd57;
+      --sub-color: #aaa;
+      --cat-bg: rgba(255,255,255,0.08);
+      --cat-border: rgba(255,255,255,0.25);
+      --cat-color: #ccc;
+      --cat-active-bg: rgba(255,221,87,0.22);
+      --cat-active-border: #ffdd57;
+      --cat-active-color: #ffdd57;
+      --card-bg: rgba(255,255,255,0.06);
+      --card-border: rgba(255,255,255,0.1);
+      --menu-name: #fff;
+      --menu-desc: #aaa;
+      --tag-bg: rgba(255,221,87,0.15);
+      --tag-color: #ffdd57;
+      --select-bg: rgba(255,255,255,0.08);
+      --select-border: rgba(255,255,255,0.2);
+      --select-color: #ccc;
+      --select-opt-bg: #1a1a2e;
+      --label-color: #aaa;
+      --toggle-bg: rgba(255,255,255,0.1);
+      --toggle-color: #ccc;
+      --toggle-border: rgba(255,255,255,0.2);
+      --input-bg: rgba(255,255,255,0.06);
+      --input-border: rgba(255,255,255,0.15);
+      --input-color: #eee;
+      --input-placeholder: #777;
+      --form-title: #ffdd57;
+      --form-label: #bbb;
+      --divider: rgba(255,255,255,0.1);
+    }
+
+    /* ── 라이트 모드 ── */
+    [data-theme="light"] {
+      --bg: linear-gradient(135deg, #f5f0e8, #fde9c9, #ffd580);
+      --container-bg: rgba(255,255,255,0.75);
+      --container-border: rgba(0,0,0,0.08);
+      --title-color: #c47d00;
+      --sub-color: #666;
+      --cat-bg: rgba(0,0,0,0.05);
+      --cat-border: rgba(0,0,0,0.15);
+      --cat-color: #555;
+      --cat-active-bg: rgba(196,125,0,0.15);
+      --cat-active-border: #c47d00;
+      --cat-active-color: #c47d00;
+      --card-bg: rgba(255,255,255,0.85);
+      --card-border: rgba(0,0,0,0.08);
+      --menu-name: #222;
+      --menu-desc: #666;
+      --tag-bg: rgba(196,125,0,0.12);
+      --tag-color: #b36a00;
+      --select-bg: rgba(255,255,255,0.8);
+      --select-border: rgba(0,0,0,0.2);
+      --select-color: #444;
+      --select-opt-bg: #fff;
+      --label-color: #555;
+      --toggle-bg: rgba(0,0,0,0.06);
+      --toggle-color: #555;
+      --toggle-border: rgba(0,0,0,0.15);
+      --input-bg: rgba(255,255,255,0.85);
+      --input-border: rgba(0,0,0,0.15);
+      --input-color: #222;
+      --input-placeholder: #aaa;
+      --form-title: #c47d00;
+      --form-label: #555;
+      --divider: rgba(0,0,0,0.1);
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      margin: 0;
+      padding: 40px 0;
+    }
+    .container {
+      background: var(--container-bg);
+      border-radius: 24px;
+      padding: 44px 40px;
+      text-align: center;
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--container-border);
+      width: 460px;
+      max-width: 95vw;
+      position: relative;
+    }
+
+    /* ── 상단 우측 버튼 그룹 ── */
+    .top-controls {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      display: flex;
+      gap: 6px;
+    }
+    .top-btn {
+      background: var(--toggle-bg);
+      border: 1px solid var(--toggle-border);
+      color: var(--toggle-color);
+      border-radius: 50px;
+      padding: 5px 12px;
+      font-size: 0.78rem;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+    }
+    .top-btn:hover { opacity: 0.75; }
+
+    h1 {
+      color: var(--title-color);
+      font-size: 2rem;
+      margin-bottom: 6px;
+    }
+    p.sub {
+      color: var(--sub-color);
+      margin-bottom: 32px;
+      font-size: 0.92rem;
+    }
+    .category-filter {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+    .cat-btn {
+      padding: 6px 16px;
+      border-radius: 50px;
+      border: 1px solid var(--cat-border);
+      background: var(--cat-bg);
+      color: var(--cat-color);
+      font-size: 0.82rem;
+      cursor: pointer;
+      margin-top: 0;
+      box-shadow: none;
+    }
+    .cat-btn:hover, .cat-btn.active {
+      background: var(--cat-active-bg);
+      border-color: var(--cat-active-border);
+      color: var(--cat-active-color);
+      transform: none;
+      box-shadow: none;
+    }
+    #result-area {
+      min-height: 120px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      align-items: center;
+    }
+    .menu-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 18px 24px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      text-align: left;
+      animation: fadeIn 0.4s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .menu-emoji { font-size: 2.4rem; flex-shrink: 0; }
+    .menu-info  { flex: 1; }
+    .menu-name  { color: var(--menu-name); font-size: 1.15rem; font-weight: bold; margin-bottom: 4px; }
+    .menu-desc  { color: var(--menu-desc); font-size: 0.82rem; line-height: 1.4; }
+    .menu-tag {
+      display: inline-block;
+      background: var(--tag-bg);
+      color: var(--tag-color);
+      border-radius: 50px;
+      padding: 2px 10px;
+      font-size: 0.75rem;
+      margin-top: 6px;
+    }
+    select {
+      background: var(--select-bg);
+      border: 1px solid var(--select-border);
+      color: var(--select-color);
+      border-radius: 10px;
+      padding: 6px 12px;
+      font-size: 0.88rem;
+      cursor: pointer;
+      margin-bottom: 20px;
+      outline: none;
+    }
+    select option { background: var(--select-opt-bg); }
+    button#pickBtn {
+      margin-top: 28px;
+      padding: 14px 44px;
+      background: linear-gradient(135deg, #f0a500, #ffdd57);
+      color: #333;
+      border: none;
+      border-radius: 50px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.2s;
+      box-shadow: 0 4px 15px rgba(240,165,0,0.4);
+    }
+    button#pickBtn:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(240,165,0,0.6); }
+    button#pickBtn:active { transform: scale(0.97); }
+
+    /* ── 제휴 문의 폼 ── */
+    .form-section {
+      margin-top: 40px;
+      padding-top: 32px;
+      border-top: 1px solid var(--divider);
+      text-align: left;
+    }
+    .form-section h2 {
+      color: var(--form-title);
+      font-size: 1.1rem;
+      margin-bottom: 6px;
+      text-align: center;
+    }
+    .form-section p.form-sub {
+      color: var(--sub-color);
+      font-size: 0.82rem;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 14px;
+    }
+    .form-group label {
+      color: var(--form-label);
+      font-size: 0.82rem;
+    }
+    .form-group input,
+    .form-group textarea,
+    .form-group select.form-select {
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      color: var(--input-color);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 0.88rem;
+      outline: none;
+      width: 100%;
+      font-family: inherit;
+      resize: vertical;
+    }
+    .form-group input::placeholder,
+    .form-group textarea::placeholder { color: var(--input-placeholder); }
+    .form-group input:focus,
+    .form-group textarea:focus { border-color: var(--cat-active-border); }
+    .form-group select.form-select { cursor: pointer; margin-bottom: 0; }
+    .form-group select.form-select option { background: var(--select-opt-bg); }
+    button#submitBtn {
+      width: 100%;
+      margin-top: 6px;
+      padding: 12px;
+      background: linear-gradient(135deg, #f0a500, #ffdd57);
+      color: #333;
+      border: none;
+      border-radius: 50px;
+      font-size: 0.95rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.2s;
+      box-shadow: 0 4px 15px rgba(240,165,0,0.4);
+    }
+    button#submitBtn:hover { transform: scale(1.02); box-shadow: 0 6px 20px rgba(240,165,0,0.6); }
+    button#submitBtn:active { transform: scale(0.98); }
+    .form-success {
+      display: none;
+      text-align: center;
+      color: #4caf7d;
+      font-size: 0.95rem;
+      padding: 14px;
+      border-radius: 10px;
+      background: rgba(76,175,80,0.1);
+      border: 1px solid rgba(76,175,80,0.25);
+      margin-top: 10px;
+    }
+
+    /* ── 댓글 섹션 ── */
+    .comments-section {
+      margin-top: 40px;
+      padding-top: 32px;
+      border-top: 1px solid var(--divider);
+    }
+    .comments-section h2 {
+      color: var(--form-title);
+      font-size: 1.1rem;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    #disqus_thread a { color: var(--title-color); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="top-controls">
+      <a href="en.html" class="top-btn">🇺🇸 EN</a>
+      <button class="top-btn" onclick="toggleTheme()" id="themeBtn">☀️ 라이트</button>
+    </div>
+
+    <h1>🍽️ 오늘 저녁 뭐 먹지?</h1>
+    <p class="sub">카테고리를 고르고 랜덤 메뉴 추천을 받아보세요</p>
+
+    <div class="category-filter">
+      <button class="cat-btn active" onclick="setCategory(this,'all')">전체</button>
+      <button class="cat-btn" onclick="setCategory(this,'korean')">🇰🇷 한식</button>
+      <button class="cat-btn" onclick="setCategory(this,'chinese')">🥡 중식</button>
+      <button class="cat-btn" onclick="setCategory(this,'japanese')">🍱 일식</button>
+      <button class="cat-btn" onclick="setCategory(this,'western')">🍝 양식</button>
+      <button class="cat-btn" onclick="setCategory(this,'snack')">🍜 분식</button>
+    </div>
+
+    <div style="margin-bottom:6px;">
+      <label id="countLabel" style="font-size:0.85rem;color:var(--label-color);">추천 개수 &nbsp;</label>
+      <select id="countSel">
+        <option value="1">1개</option>
+        <option value="2">2개</option>
+        <option value="3" selected>3개</option>
+        <option value="5">5개</option>
+      </select>
+    </div>
+
+    <div id="result-area"></div>
+    <button id="pickBtn" onclick="pick()">🎲 메뉴 추천받기</button>
+
+    <!-- 제휴 문의 폼 -->
+    <div class="form-section">
+      <h2>🤝 제휴 문의</h2>
+      <p class="form-sub">식당, 브랜드, 광고 제휴 문의를 남겨주세요</p>
+
+      <form id="contactForm" action="https://formspree.io/f/maqldnjl" method="POST">
+        <div class="form-group">
+          <label for="fname">이름 / 회사명</label>
+          <input type="text" id="fname" name="name" placeholder="홍길동 / (주)맛있는식당" required>
+        </div>
+        <div class="form-group">
+          <label for="femail">이메일</label>
+          <input type="email" id="femail" name="email" placeholder="example@email.com" required>
+        </div>
+        <div class="form-group">
+          <label for="ftype">문의 유형</label>
+          <select id="ftype" name="type" class="form-select">
+            <option value="식당 제휴">식당 제휴</option>
+            <option value="브랜드 제휴">브랜드 제휴</option>
+            <option value="광고 문의">광고 문의</option>
+            <option value="기타">기타</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="fmsg">문의 내용</label>
+          <textarea id="fmsg" name="message" rows="4" placeholder="문의하실 내용을 자유롭게 작성해 주세요." required></textarea>
+        </div>
+        <button type="submit" id="submitBtn">✉️ 문의 보내기</button>
+      </form>
+      <div class="form-success" id="formSuccess">✅ 문의가 성공적으로 전송되었습니다. 빠르게 연락드리겠습니다!</div>
+    </div>
+
+    <!-- 댓글 섹션 -->
+    <div class="comments-section">
+      <h2>💬 댓글</h2>
+      <div id="disqus_thread"></div>
+      <script>
+        (function() {
+          var d = document, s = d.createElement('script');
+          s.src = 'https://product-3-pages-dev.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      </script>
+      <noscript>댓글을 보려면 JavaScript를 활성화해 주세요. <a href="https://disqus.com/?ref_noscript">Disqus로 제공되는 댓글</a></noscript>
+    </div>
+  </div>
+
+  <script>
+    const MENUS = [
+      { name:'삼겹살',   cat:'korean',   emoji:'🥩', desc:'두툼한 삼겹살에 쌈 채소와 된장찌개',        tag:'인기' },
+      { name:'김치찌개', cat:'korean',   emoji:'🍲', desc:'칼칼하고 깊은 맛의 돼지 김치찌개',          tag:'집밥' },
+      { name:'된장찌개', cat:'korean',   emoji:'🥣', desc:'구수한 된장에 두부와 호박',                  tag:'집밥' },
+      { name:'불고기',   cat:'korean',   emoji:'🍖', desc:'달콤한 양념 소불고기 덮밥',                  tag:'한식' },
+      { name:'비빔밥',   cat:'korean',   emoji:'🥗', desc:'형형색색 나물과 고추장 비빔밥',              tag:'건강식' },
+      { name:'순두부찌개',cat:'korean',  emoji:'🍳', desc:'보들보들 순두부에 해물 또는 돼지고기',       tag:'집밥' },
+      { name:'갈비탕',   cat:'korean',   emoji:'🍜', desc:'진하게 우린 소갈비탕',                      tag:'보양식' },
+      { name:'제육볶음', cat:'korean',   emoji:'🥘', desc:'매콤달콤 돼지고기 제육볶음 + 공기밥',        tag:'집밥' },
+      { name:'닭볶음탕', cat:'korean',   emoji:'🍗', desc:'칼칼한 양념의 닭볶음탕',                    tag:'한식' },
+      { name:'짜장면',   cat:'chinese',  emoji:'🍝', desc:'고소한 춘장 짜장에 달걀 후라이',             tag:'중식' },
+      { name:'짬뽕',     cat:'chinese',  emoji:'🦐', desc:'해물이 가득한 칼칼한 짬뽕',                 tag:'중식' },
+      { name:'탕수육',   cat:'chinese',  emoji:'🍖', desc:'바삭한 탕수육 (부먹 or 찍먹 선택)',          tag:'중식' },
+      { name:'마파두부', cat:'chinese',  emoji:'🌶️', desc:'매콤한 사천식 마파두부 덮밥',               tag:'중식' },
+      { name:'볶음밥',   cat:'chinese',  emoji:'🍚', desc:'파, 달걀, 새우가 들어간 중국식 볶음밥',      tag:'간단' },
+      { name:'초밥',     cat:'japanese', emoji:'🍣', desc:'신선한 생선을 얹은 쥐어짠 초밥 세트',        tag:'일식' },
+      { name:'라멘',     cat:'japanese', emoji:'🍜', desc:'진한 돈코츠 or 쇼유 라멘',                  tag:'일식' },
+      { name:'돈가스',   cat:'japanese', emoji:'🍱', desc:'바삭한 돈가스 + 카레 or 소스',               tag:'일식' },
+      { name:'우동',     cat:'japanese', emoji:'🍜', desc:'쫄깃한 면발의 따뜻한 우동',                 tag:'일식' },
+      { name:'규동',     cat:'japanese', emoji:'🥩', desc:'달콤한 소고기 양파 규동 덮밥',               tag:'일식' },
+      { name:'파스타',   cat:'western',  emoji:'🍝', desc:'알리오올리오 or 크림 페투치네',              tag:'양식' },
+      { name:'피자',     cat:'western',  emoji:'🍕', desc:'화덕 or 도우 피자 한 판',                   tag:'양식' },
+      { name:'스테이크', cat:'western',  emoji:'🥩', desc:'미디엄 레어 채끝 스테이크',                 tag:'특식' },
+      { name:'햄버거',   cat:'western',  emoji:'🍔', desc:'수제 패티 버거 + 감자튀김',                 tag:'양식' },
+      { name:'리조또',   cat:'western',  emoji:'🍚', desc:'버섯 크림 리조또',                          tag:'양식' },
+      { name:'떡볶이',   cat:'snack',    emoji:'🌶️', desc:'쫀득한 떡볶이 + 튀김 + 순대',              tag:'분식' },
+      { name:'라볶이',   cat:'snack',    emoji:'🍜', desc:'라면과 떡볶이의 황금 조합',                 tag:'분식' },
+      { name:'김밥',     cat:'snack',    emoji:'🍙', desc:'참치 or 치즈 김밥 + 어묵국',                tag:'분식' },
+      { name:'쫄면',     cat:'snack',    emoji:'🥗', desc:'새콤달콤 쫄면 + 반숙 달걀',                 tag:'분식' },
+      { name:'순대국밥', cat:'snack',    emoji:'🍲', desc:'구수한 순대국밥에 소면 추가',               tag:'분식' },
+    ];
+
+    let currentCat = 'all';
+
+    function toggleTheme() {
+      const html = document.documentElement;
+      const isDark = html.getAttribute('data-theme') === 'dark';
+      html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+      document.getElementById('themeBtn').textContent = isDark ? '🌙 다크' : '☀️ 라이트';
+    }
+
+    function setCategory(el, cat) {
+      currentCat = cat;
+      document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+      el.classList.add('active');
+    }
+
+    function pick() {
+      const pool = currentCat === 'all' ? MENUS : MENUS.filter(m => m.cat === currentCat);
+      const count = Math.min(parseInt(document.getElementById('countSel').value), pool.length);
+      const picked = [...pool].sort(() => Math.random() - 0.5).slice(0, count);
+      const area = document.getElementById('result-area');
+      area.innerHTML = '';
+      picked.forEach((m, i) => {
+        setTimeout(() => {
+          area.innerHTML += `
+            <div class="menu-card">
+              <div class="menu-emoji">${m.emoji}</div>
+              <div class="menu-info">
+                <div class="menu-name">${m.name}</div>
+                <div class="menu-desc">${m.desc}</div>
+                <span class="menu-tag">${m.tag}</span>
+              </div>
+            </div>`;
+        }, i * 120);
+      });
+    }
+
+    pick();
+
+    // 제휴 문의 폼 AJAX 전송
+    document.getElementById('contactForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      btn.textContent = '전송 중...';
+      btn.disabled = true;
+      try {
+        const res = await fetch(this.action, {
+          method: 'POST',
+          body: new FormData(this),
+          headers: { 'Accept': 'application/json' }
+        });
+        if (res.ok) {
+          this.style.display = 'none';
+          document.getElementById('formSuccess').style.display = 'block';
+        } else {
+          btn.textContent = '✉️ 문의 보내기';
+          btn.disabled = false;
+          alert('전송에 실패했습니다. 다시 시도해 주세요.');
+        }
+      } catch {
+        btn.textContent = '✉️ 문의 보내기';
+        btn.disabled = false;
+        alert('네트워크 오류가 발생했습니다.');
+      }
+    });
+  </script>
+</body>
+</html>

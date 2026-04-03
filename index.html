@@ -44,15 +44,27 @@
 
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: var(--bg);
       min-height: 100vh;
       display: flex;
       align-items: flex-start;
       justify-content: center;
       margin: 0;
       padding: 40px 16px;
+      position: relative;
+      background: #111;
     }
-
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: url('images.jpg') center center / cover no-repeat;
+      filter: blur(6px) brightness(0.45);
+      transform: scale(1.05);
+      z-index: 0;
+    }
+    [data-theme="light"] body::before {
+      filter: blur(6px) brightness(0.75);
+    }
     .container {
       background: var(--container-bg);
       border-radius: 28px;
@@ -63,6 +75,7 @@
       width: 520px;
       max-width: 95vw;
       position: relative;
+      z-index: 1;
     }
 
     .top-controls {

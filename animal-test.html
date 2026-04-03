@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>나의 동물상은? 🐾</title>
+  <style>
+    * { box-sizing: border-box; transition: background 0.3s, color 0.3s, border-color 0.3s; }
+
+    [data-theme="dark"] {
+      --bg: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+      --container-bg: rgba(255,255,255,0.07);
+      --container-border: rgba(255,255,255,0.12);
+      --title-color: #a78bfa;
+      --sub-color: #aaa;
+      --card-bg: rgba(255,255,255,0.06);
+      --card-border: rgba(255,255,255,0.1);
+      --text: #eee;
+      --text-muted: #aaa;
+      --divider: rgba(255,255,255,0.1);
+      --toggle-bg: rgba(255,255,255,0.1);
+      --toggle-color: #ccc;
+      --toggle-border: rgba(255,255,255,0.2);
+      --bar-bg: rgba(255,255,255,0.1);
+      --result-card-bg: rgba(255,255,255,0.08);
+    }
+    [data-theme="light"] {
+      --bg: linear-gradient(135deg, #f3e8ff, #ede0ff, #ddd6fe);
+      --container-bg: rgba(255,255,255,0.8);
+      --container-border: rgba(0,0,0,0.08);
+      --title-color: #7c3aed;
+      --sub-color: #666;
+      --card-bg: rgba(255,255,255,0.9);
+      --card-border: rgba(0,0,0,0.08);
+      --text: #222;
+      --text-muted: #666;
+      --divider: rgba(0,0,0,0.1);
+      --toggle-bg: rgba(0,0,0,0.06);
+      --toggle-color: #555;
+      --toggle-border: rgba(0,0,0,0.15);
+      --bar-bg: rgba(0,0,0,0.08);
+      --result-card-bg: rgba(124,58,237,0.07);
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      margin: 0;
+      padding: 40px 16px;
+    }
+
+    .container {
+      background: var(--container-bg);
+      border-radius: 28px;
+      padding: 44px 40px;
+      text-align: center;
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--container-border);
+      width: 520px;
+      max-width: 95vw;
+      position: relative;
+    }
+
+    .top-controls {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      display: flex;
+      gap: 6px;
+    }
+    .top-btn {
+      background: var(--toggle-bg);
+      border: 1px solid var(--toggle-border);
+      color: var(--toggle-color);
+      border-radius: 50px;
+      padding: 5px 12px;
+      font-size: 0.78rem;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+    }
+    .top-btn:hover { opacity: 0.75; }
+
+    h1 {
+      color: var(--title-color);
+      font-size: 2rem;
+      margin-bottom: 6px;
+    }
+    p.sub {
+      color: var(--sub-color);
+      font-size: 0.92rem;
+      margin-bottom: 32px;
+      line-height: 1.6;
+    }
+
+    /* ── 탭 ── */
+    .tab-group {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 28px;
+    }
+    .tab-btn {
+      padding: 8px 22px;
+      border-radius: 50px;
+      border: 1px solid var(--toggle-border);
+      background: var(--toggle-bg);
+      color: var(--toggle-color);
+      font-size: 0.88rem;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .tab-btn.active {
+      background: linear-gradient(135deg, #7c3aed, #a78bfa);
+      border-color: transparent;
+      color: #fff;
+    }
+
+    /* ── 웹캠 영역 ── */
+    #webcam-section, #upload-section { display: none; }
+    #webcam-section.active, #upload-section.active { display: block; }
+
+    #webcam-container {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+    #webcam-container canvas {
+      border-radius: 18px;
+      border: 2px solid var(--container-border);
+      max-width: 100%;
+    }
+
+    /* ── 업로드 영역 ── */
+    .upload-area {
+      border: 2px dashed var(--toggle-border);
+      border-radius: 18px;
+      padding: 36px 20px;
+      cursor: pointer;
+      margin-bottom: 16px;
+      transition: border-color 0.2s, background 0.2s;
+      position: relative;
+    }
+    .upload-area:hover {
+      border-color: #a78bfa;
+      background: rgba(167,139,250,0.05);
+    }
+    .upload-area input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+    .upload-icon { font-size: 2.5rem; margin-bottom: 8px; }
+    .upload-area p { color: var(--sub-color); font-size: 0.88rem; margin: 0; }
+
+    #preview-container {
+      display: none;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+    #preview-img {
+      max-width: 100%;
+      max-height: 280px;
+      border-radius: 18px;
+      border: 2px solid var(--container-border);
+      object-fit: cover;
+    }
+
+    /* ── 버튼 ── */
+    .action-btn {
+      padding: 13px 40px;
+      background: linear-gradient(135deg, #7c3aed, #a78bfa);
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.2s;
+      box-shadow: 0 4px 15px rgba(124,58,237,0.4);
+      margin: 4px;
+    }
+    .action-btn:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(124,58,237,0.6); }
+    .action-btn:active { transform: scale(0.97); }
+    .action-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .action-btn.secondary {
+      background: var(--toggle-bg);
+      color: var(--toggle-color);
+      border: 1px solid var(--toggle-border);
+      box-shadow: none;
+    }
+    .action-btn.secondary:hover { box-shadow: none; opacity: 0.8; }
+
+    /* ── 로딩 ── */
+    #loading {
+      display: none;
+      color: var(--sub-color);
+      font-size: 0.9rem;
+      margin: 12px 0;
+    }
+    .spinner {
+      display: inline-block;
+      width: 18px; height: 18px;
+      border: 2px solid var(--toggle-border);
+      border-top-color: #a78bfa;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── 결과 ── */
+    #result-section {
+      display: none;
+      margin-top: 28px;
+      animation: fadeIn 0.5s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .result-card {
+      background: var(--result-card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 28px 24px;
+      margin-bottom: 20px;
+    }
+    .result-animal-emoji { font-size: 4rem; margin-bottom: 8px; }
+    .result-title {
+      font-size: 1.6rem;
+      font-weight: bold;
+      color: var(--title-color);
+      margin-bottom: 6px;
+    }
+    .result-desc {
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    /* ── 확률 바 ── */
+    .prob-bars { text-align: left; }
+    .prob-item { margin-bottom: 12px; }
+    .prob-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: var(--text);
+      margin-bottom: 5px;
+      font-weight: 600;
+    }
+    .prob-bar-wrap {
+      background: var(--bar-bg);
+      border-radius: 50px;
+      height: 10px;
+      overflow: hidden;
+    }
+    .prob-bar-fill {
+      height: 100%;
+      border-radius: 50px;
+      transition: width 0.8s ease;
+    }
+    .prob-bar-fill.dog  { background: linear-gradient(90deg, #f97316, #fb923c); }
+    .prob-bar-fill.cat  { background: linear-gradient(90deg, #a78bfa, #c4b5fd); }
+
+    /* ── 실시간 라벨 ── */
+    #live-labels {
+      margin-top: 14px;
+      display: none;
+    }
+    #live-labels .prob-item { margin-bottom: 10px; }
+
+    /* ── 성격 설명 ── */
+    .traits {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 12px;
+    }
+    .trait-tag {
+      background: rgba(167,139,250,0.18);
+      color: #a78bfa;
+      border-radius: 50px;
+      padding: 4px 14px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    [data-theme="light"] .trait-tag {
+      background: rgba(124,58,237,0.1);
+      color: #7c3aed;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="top-controls">
+      <button class="top-btn" onclick="toggleTheme()" id="themeBtn">☀️ 라이트</button>
+    </div>
+
+    <h1>🐾 나의 동물상은?</h1>
+    <p class="sub">AI가 당신의 얼굴을 분석해<br>강아지상인지 고양이상인지 알려드려요!</p>
+
+    <!-- 탭 -->
+    <div class="tab-group">
+      <button class="tab-btn active" onclick="switchTab('webcam', this)">📷 웹캠</button>
+      <button class="tab-btn" onclick="switchTab('upload', this)">🖼️ 사진 업로드</button>
+    </div>
+
+    <!-- 웹캠 섹션 -->
+    <div id="webcam-section" class="active">
+      <div id="webcam-container"></div>
+      <div id="live-labels"></div>
+      <div id="loading"><span class="spinner"></span> 모델 불러오는 중...</div>
+      <div style="margin-top: 12px;">
+        <button class="action-btn" id="startBtn" onclick="initWebcam()">🎥 웹캠 시작</button>
+        <button class="action-btn" id="snapBtn" onclick="snapshot()" style="display:none;">📸 지금 분석하기</button>
+        <button class="action-btn secondary" id="stopBtn" onclick="stopWebcam()" style="display:none;">⏹ 중지</button>
+      </div>
+    </div>
+
+    <!-- 업로드 섹션 -->
+    <div id="upload-section">
+      <div class="upload-area" id="uploadArea">
+        <input type="file" accept="image/*" id="fileInput" onchange="handleFile(event)">
+        <div class="upload-icon">📁</div>
+        <p>클릭하거나 사진을 드래그하세요<br><span style="font-size:0.8rem;opacity:0.7;">JPG, PNG, GIF 지원</span></p>
+      </div>
+      <div id="preview-container">
+        <img id="preview-img" alt="업로드 이미지">
+      </div>
+      <div id="loading-upload" style="display:none;color:var(--sub-color);font-size:0.9rem;margin:12px 0;">
+        <span class="spinner"></span> 분석 중...
+      </div>
+      <button class="action-btn" id="analyzeBtn" onclick="analyzeUpload()" style="display:none;">🔍 분석하기</button>
+    </div>
+
+    <!-- 결과 -->
+    <div id="result-section">
+      <div class="result-card">
+        <div class="result-animal-emoji" id="resultEmoji"></div>
+        <div class="result-title" id="resultTitle"></div>
+        <div class="result-desc" id="resultDesc"></div>
+        <div class="traits" id="resultTraits"></div>
+      </div>
+      <div class="prob-bars" id="probBars"></div>
+      <div style="margin-top: 20px;">
+        <button class="action-btn secondary" onclick="resetResult()">🔄 다시 테스트</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+  <script>
+    const MODEL_URL = "https://teachablemachine.withgoogle.com/models/STdSwy-yj/";
+
+    const ANIMAL_INFO = {
+      dog: {
+        emoji: "🐶",
+        keywords: ["강아지", "dog", "Dog", "강아지상"],
+        title: "강아지상이에요!",
+        desc: "따뜻하고 친근한 인상을 가졌어요. 사람들에게 편안함을 주고 신뢰감 있는 분위기를 풍깁니다.",
+        traits: ["#친근함", "#신뢰감", "#따뜻함", "#활발함", "#충직함"],
+        barClass: "dog"
+      },
+      cat: {
+        emoji: "🐱",
+        keywords: ["고양이", "cat", "Cat", "고양이상"],
+        title: "고양이상이에요!",
+        desc: "시크하고 세련된 인상을 가졌어요. 독립적이고 미스터리한 매력으로 사람들의 시선을 끌어당깁니다.",
+        traits: ["#시크함", "#세련됨", "#독립적", "#미스터리", "#도도함"],
+        barClass: "cat"
+      }
+    };
+
+    let model, webcam, webcamRunning = false, animationId;
+    let currentTab = "webcam";
+    let uploadedImg = null;
+
+    function toggleTheme() {
+      const html = document.documentElement;
+      const isDark = html.getAttribute("data-theme") === "dark";
+      html.setAttribute("data-theme", isDark ? "light" : "dark");
+      document.getElementById("themeBtn").textContent = isDark ? "🌙 다크" : "☀️ 라이트";
+    }
+
+    function switchTab(tab, el) {
+      currentTab = tab;
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      el.classList.add("active");
+      document.querySelectorAll("#webcam-section, #upload-section").forEach(s => s.classList.remove("active"));
+      document.getElementById(tab + "-section").classList.add("active");
+      hideResult();
+      if (tab === "webcam" && webcamRunning) {
+        // keep running
+      } else if (tab === "upload") {
+        stopWebcam();
+      }
+    }
+
+    // ── 모델 로드 ──
+    async function loadModel() {
+      if (!model) {
+        model = await tmImage.load(MODEL_URL + "model.json", MODEL_URL + "metadata.json");
+      }
+      return model;
+    }
+
+    // ── 웹캠 ──
+    async function initWebcam() {
+      document.getElementById("startBtn").style.display = "none";
+      document.getElementById("loading").style.display = "block";
+      try {
+        await loadModel();
+        webcam = new tmImage.Webcam(320, 320, true);
+        await webcam.setup();
+        await webcam.play();
+        webcamRunning = true;
+
+        document.getElementById("webcam-container").innerHTML = "";
+        document.getElementById("webcam-container").appendChild(webcam.canvas);
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("snapBtn").style.display = "inline-flex";
+        document.getElementById("stopBtn").style.display = "inline-flex";
+        document.getElementById("live-labels").style.display = "block";
+
+        loopWebcam();
+      } catch (e) {
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("startBtn").style.display = "inline-flex";
+        alert("웹캠을 시작할 수 없습니다. 카메라 권한을 확인해 주세요.");
+      }
+    }
+
+    async function loopWebcam() {
+      if (!webcamRunning) return;
+      webcam.update();
+      const prediction = await model.predict(webcam.canvas);
+      renderLiveLabels(prediction);
+      animationId = requestAnimationFrame(loopWebcam);
+    }
+
+    function renderLiveLabels(prediction) {
+      const container = document.getElementById("live-labels");
+      container.innerHTML = prediction.map(p => {
+        const info = getAnimalInfo(p.className);
+        const pct = (p.probability * 100).toFixed(1);
+        return `
+          <div class="prob-item">
+            <div class="prob-label">
+              <span>${info ? info.emoji : ""} ${p.className}</span>
+              <span>${pct}%</span>
+            </div>
+            <div class="prob-bar-wrap">
+              <div class="prob-bar-fill ${info ? info.barClass : ""}" style="width:${pct}%"></div>
+            </div>
+          </div>`;
+      }).join("");
+    }
+
+    async function snapshot() {
+      if (!webcamRunning) return;
+      const prediction = await model.predict(webcam.canvas);
+      showResult(prediction);
+    }
+
+    function stopWebcam() {
+      webcamRunning = false;
+      if (animationId) cancelAnimationFrame(animationId);
+      if (webcam) { try { webcam.stop(); } catch(e){} }
+      document.getElementById("webcam-container").innerHTML = "";
+      document.getElementById("live-labels").style.display = "none";
+      document.getElementById("live-labels").innerHTML = "";
+      document.getElementById("snapBtn").style.display = "none";
+      document.getElementById("stopBtn").style.display = "none";
+      document.getElementById("startBtn").style.display = "inline-flex";
+    }
+
+    // ── 업로드 ──
+    function handleFile(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        const img = document.getElementById("preview-img");
+        img.src = ev.target.result;
+        img.onload = () => { uploadedImg = img; };
+        document.getElementById("preview-container").style.display = "flex";
+        document.getElementById("uploadArea").style.display = "none";
+        document.getElementById("analyzeBtn").style.display = "inline-flex";
+        hideResult();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function analyzeUpload() {
+      if (!uploadedImg) return;
+      document.getElementById("analyzeBtn").style.display = "none";
+      document.getElementById("loading-upload").style.display = "block";
+      try {
+        await loadModel();
+        const prediction = await model.predict(uploadedImg);
+        document.getElementById("loading-upload").style.display = "none";
+        showResult(prediction);
+      } catch(e) {
+        document.getElementById("loading-upload").style.display = "none";
+        document.getElementById("analyzeBtn").style.display = "inline-flex";
+        alert("분석 중 오류가 발생했습니다.");
+      }
+    }
+
+    // ── 결과 표시 ──
+    function getAnimalInfo(className) {
+      for (const key in ANIMAL_INFO) {
+        if (ANIMAL_INFO[key].keywords.some(k => className.toLowerCase().includes(k.toLowerCase()))) {
+          return ANIMAL_INFO[key];
+        }
+      }
+      return null;
+    }
+
+    function showResult(prediction) {
+      const top = prediction.reduce((a, b) => a.probability > b.probability ? a : b);
+      const info = getAnimalInfo(top.className) || {
+        emoji: "🐾", title: top.className, desc: "", traits: [], barClass: ""
+      };
+
+      document.getElementById("resultEmoji").textContent = info.emoji;
+      document.getElementById("resultTitle").textContent = info.title;
+      document.getElementById("resultDesc").textContent = info.desc;
+      document.getElementById("resultTraits").innerHTML = info.traits.map(t =>
+        `<span class="trait-tag">${t}</span>`).join("");
+
+      const barsHTML = prediction.map(p => {
+        const pInfo = getAnimalInfo(p.className);
+        const pct = (p.probability * 100).toFixed(1);
+        return `
+          <div class="prob-item">
+            <div class="prob-label">
+              <span>${pInfo ? pInfo.emoji : "🐾"} ${p.className}</span>
+              <span>${pct}%</span>
+            </div>
+            <div class="prob-bar-wrap">
+              <div class="prob-bar-fill ${pInfo ? pInfo.barClass : ""}" style="width:0%"
+                   data-target="${pct}"></div>
+            </div>
+          </div>`;
+      }).join("");
+      document.getElementById("probBars").innerHTML = barsHTML;
+
+      document.getElementById("result-section").style.display = "block";
+
+      // 바 애니메이션
+      setTimeout(() => {
+        document.querySelectorAll(".prob-bar-fill[data-target]").forEach(el => {
+          el.style.width = el.dataset.target + "%";
+        });
+      }, 50);
+
+      document.getElementById("result-section").scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    function hideResult() {
+      document.getElementById("result-section").style.display = "none";
+    }
+
+    function resetResult() {
+      hideResult();
+      if (currentTab === "upload") {
+        uploadedImg = null;
+        document.getElementById("preview-container").style.display = "none";
+        document.getElementById("uploadArea").style.display = "block";
+        document.getElementById("analyzeBtn").style.display = "none";
+        document.getElementById("fileInput").value = "";
+      }
+    }
+  </script>
+</body>
+</html>
